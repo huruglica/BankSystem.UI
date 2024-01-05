@@ -49,7 +49,7 @@
             <h2 class="text-secondary">Deposit</h2>
         </div> 
         <div class="col-6 text-right">
-            <a class="btn btn-secondary" href="/Deposit/Create.html" onclick="submitForm()"><i class="bi bi-plus-circle"></i> Make a deposit</a>
+            <a class="btn btn-secondary" href="../Deposit/Create.html" onclick="submitForm()"><i class="bi bi-plus-circle"></i> Make a deposit</a>
         </div>
 
     </div>
@@ -62,8 +62,12 @@
             <th>Transaction date</th>
         </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody id ="depositeTable">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+       </tbody>
 </table>
 
 </div>
@@ -80,3 +84,108 @@
     </div>
 </footer>
 </body>
+
+<script>
+    if (window.location.href.endsWith('/Deposit/Index.html')) {
+        // Your code to handle the case when the URL ends with '/Staff/Index.html'
+        const authToken = localStorage.getItem('authToken');
+        if (authToken) {
+            const getDepositesUrl = 'https://localhost:7100/Account/get-all/deposit';
+            console.log(authToken);
+
+            fetch(getDepositesUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+            })
+            .then(response => response.json())
+            .then(data => handleGetClientDetailsResponse(data))
+            .catch(error => console.error('Error:', error));
+        } else {
+            console.error('User not logged in. Cannot make the API request.');
+        }
+    
+        function handleGetClientDetailsResponse(response) {
+            // Handle the response from the get client details API endpoint
+            if (response.success) {
+                // Client details retrieved successfully
+                //console.log('Client details:', response.data);
+                //updateTable (response.data);
+                // You can update the UI with the client details or perform other actions.
+        
+                if (response.data && response.data.length > 0) {
+                // Client details retrieved successfully and response.data is not empty
+                console.log('Client details:', response.data);
+                updateTable(response.data);
+                // You can update the UI with the client details or perform other actions.
+            } 
+            }
+            else {
+                // Client details retrieval failed
+                const errorMessage = response.errors || 'Client details retrieval failed.';
+                console.error('Error:', errorMessage);
+        
+                // You can display an error message to the user.
+            }
+        }
+    }
+    
+    function updateTable(data) {
+        const tableBody = document.getElementById('depositeTable');
+        tableBody.innerHTML = '';
+
+        data.forEach(client => {
+        // Create a new row for each client
+            const newRow = tableBody.insertRow();
+
+            // Flag to skip the first property (column)
+            let skipFirstColumn = true;
+
+            // Iterate over the properties in the client object and populate the cells
+            for (const property in client) {
+                if (client.hasOwnProperty(property)) {
+                    // Skip the first column
+                    if (skipFirstColumn) {
+                        skipFirstColumn = false;
+                        continue;
+                    }
+
+                    const cell = newRow.insertCell();
+                    cell.textContent = `${client[property] || ''}`; // Use empty string if the property is undefined
+                }
+            }
+
+            // Add buttons cell
+            const actionsCell = newRow.insertCell();
+            const buttonsDiv = createButtonsDiv();
+            actionsCell.appendChild(buttonsDiv);
+        });
+    }
+    
+    function createButtonsDiv() {
+        const divElement = document.createElement('div');
+        divElement.className = 'btn-group w-75';
+        divElement.innerHTML = `
+            <a class="btn btn-secondary mx-2" onclick="editRow(this)">Edit <i class="bi bi-pencil-square"></i></a>
+            <a class="btn btn-danger mx-2" onclick="deleteRow(this)">Delete <i class="bi bi-trash"></i></a>
+        `;
+        return divElement;
+    }
+    
+    // Function to handle the edit button click
+    function editRow(button) {
+        const row = button.closest('tr');
+        // Implement your edit logic here using the row data
+        console.log('Edit clicked for row:', row);
+    }
+    
+    // Function to handle the delete button click
+    function deleteRow(button) {
+        const row = button.closest('tr');
+        // Implement your delete logic here using the row data
+        console.log('Delete clicked for row:', row);
+    }
+</script>

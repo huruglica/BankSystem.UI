@@ -21,25 +21,16 @@
     </div>
     <div class="card-body p-4 d-flex flex-column col-12">
 
-        <form method="post" class="p-4 col-12">
+        <form method="put" class="p-4 col-12", id="MakeWithdraw">
             <div class="border p-3">
                 <div class="form-floating py-2 col-12">
-                    <label class="p-0 ms-2 text-secondary" asp-for="AccountId">Account</label>
-                    <select asp-for="AccountId" asp-items="ViewBag.CurrentAccountsList" class="form-select form-control shadow border-0">
-                        <option disabled selected > -- Select account number -- </option>
-                    </select>
-                    <span asp-validation-for="AccountId" class="text-danger"></span>
-                </div>
-                    <div class="form-floating py-2 col-12">
-                        <label class="p-0 ms-2 text-secondary" asp-for="Amount"></label>
-                    <input asp-for="Amount" class="form-control shadow border-0" />
-                    <span asp-validation-for="Amount" class="text-danger"></span>
-                </div>
-
+                    <label class="p-0 ms-2 text-secondary" asp-for="Amount">Ammount</label>
+                <input asp-for="Amount" class="form-control shadow border-0" id="ammount" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
             </div>
             <div class="row pt-2">
                 <div class="col-6 col-md-3">
-                    <button type="submit" onclick="submitForm()" class="btn btn-secondary form-control">Withdraw</button>
+                    <button type="submit" class="btn btn-secondary form-control">Withdraw</button>
                 </div>
 
                 <div class="col-6 col-md-3">
@@ -53,3 +44,52 @@
 
 </div>
 
+<script>
+    document.getElementById("MakeWithdraw").addEventListener("submit", function (event) {
+      event.preventDefault();
+  
+      const ammount = document.getElementById("ammount").value;
+      // Your login API endpoint
+      const url = 'https://localhost:7100/Account/withdraw';
+  
+      // Request payload
+      const data = {
+          ammount: ammount
+      };
+  
+    //   Make the API request using fetch
+      fetch(url, {
+          method: 'PUT',
+          headers: {
+              'Accept': '*/*',
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+    //   .then(data => handleLoginResponse(data))
+      .catch(error => console.error('Error:', error));
+  });
+  
+  function handleLoginResponse(response) {
+      if (response.success) {
+          // Successful login
+          const token = response.message;
+          console.log('Login successful. Token:', token);
+  
+         // Save the token in localStorage
+          localStorage.setItem('authToken', token);
+          window.location.href = '../Withdrawal/Index.html';
+  
+          // You can perform further actions, such as redirecting to another page.
+      } else {
+          // Login failed
+          const errorMessage = response.errors || 'Login failed.';
+          console.error('Error:', errorMessage);
+  
+          // You can display an error message on the login form.
+      }
+  }
+  
+  </script>
