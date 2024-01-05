@@ -1,0 +1,165 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" href="~/style/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/style/lib/bootstrap/dist/css/bootstrap.css" />
+
+</head>
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient m-lg-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Create Client</h2>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-4 d-flex flex-column col-12">
+
+        <form method="post" class="p-4 col-12" id="ClientForm">
+            <div class="border p-3">
+
+
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="IdCardClient" class="ms-2">Id Card</label>
+                    <input id="IdCardClient"  class="form-control border-0 shadow" />
+                    <span asp-validation-for="IdCardClient" class="text-danger"></span>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="Name" class="ms-2">Name</label>
+                    <input id="Name"  class="form-control border-0 shadow" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="Surname" class="ms-2">Surname</label>
+                    <input id="Surname" class="form-control border-0 shadow" />
+                    <span asp-validation-for="Surname" class="text-danger"></span>
+
+                </div>
+               <div class="form-floating mb-3 col-12">
+                <label class="p-0 text-secondary ms-2"  asp-for="Input.Password">Pin</label>
+                <input id="pin" class="form-control border-0 shadow" autocomplete="new-password" aria-required="true" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+              </div>
+
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="Address" class="ms-2">Address</label>
+                    <input id="address"  class="form-control border-0 shadow" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="PhoneNumber" class="ms-2">Phone number</label>
+                    <input id="phoneNumber" class="form-control border-0 shadow" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="Email" class="ms-2">Email</label>
+                    <input id="email" class="form-control border-0 shadow" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+
+
+
+
+
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3">
+                        <button type="submit" class="btn btn-secondary form-control">Create</button>
+                    </div>
+
+
+                    <div class="col-6 col-md-3">
+                        <a href ="../Client/Index.html" class="btn btn-outline-secondary  form-control">Back</a>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="..." crossorigin="anonymous"></script>
+
+
+
+<script>
+
+  document.getElementById("ClientForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const authToken = localStorage.getItem('authToken');
+
+    const ClientNameValue = document.getElementById('Name').value;
+    const ClientSurnameValue = document.getElementById('Surname').value;
+    const idCardClientValue = document.getElementById('IdCardClient').value;
+    const ClientPinValue = document.getElementById('pin').value;
+  //  const ClientBalanceValue = document.getElementById('balance').value;
+  //  const ClientValuteValue = document.getElementById('valute').value;
+    const ClientEmailValue = document.getElementById('email').value;
+    const ClientAddressValue = document.getElementById('address').value;
+    const ClientPhoneNumberValue = document.getElementById('phoneNumber').value;
+
+
+
+    const clientUrl = 'https://localhost:7190/User/client';
+    const data = {
+      name: ClientNameValue,
+      surname: ClientSurnameValue,
+      idCardNumber: idCardClientValue,
+      pinCode: ClientPinValue,
+      balance: 0,
+      valuteId: 1,
+      email: ClientEmailValue,
+      address: ClientAddressValue,
+      phoneNumber: ClientPhoneNumberValue
+    };
+
+    // Make the API request using fetch
+    fetch(clientUrl, {
+        method: 'POST',
+        headers: {
+            'Accept': '*/*',
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => handleCreateClientResponse(data))
+    .catch(error => console.error('Error:', error));
+});
+
+function handleCreateClientResponse(response) {
+    // Handle the response from the create client API endpoint
+    if (response.success) {
+        // Client creation successful
+        console.log('Client created successfully:', response.data);
+        window.location.href = '../Client/Index.html';
+
+        // You can perform further actions, such as updating the UI or redirecting.
+    } else {
+        // Client creation failed
+        const errorMessage = response.errors || 'Client creation failed.';
+        console.error('Error:', errorMessage);
+
+        // You can display an error message to the user.
+    }
+}
+
+
+
+</script>

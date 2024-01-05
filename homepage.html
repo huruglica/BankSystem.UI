@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" href="~/style/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/style/lib/bootstrap/dist/css/bootstrap.css" />
+
+    <title>Home Page</title>
+    <!-- You can include your stylesheets and other necessary links here -->
+</head>
+<body>  
+
+    <div class="container" style="text-align: center; margin-top: 50px;">
+        <h2 class="text-secondary mb-4">Choose Your Role</h2>
+        <button class="text-secondary mr-4 p-3 font-weight-bold" onclick="redirectToLogin('staff')">Login as Staff</button>
+        <button class="text-secondary p-3 font-weight-bold" onclick="redirectToLogin('client')">Login as Client</button>
+    </div>
+
+    <script>
+        function redirectToLogin(role) {
+            if (role === 'staff') {
+                window.location.href = 'BankSystemAppView_employee/Login/login.html'; // Change this to the actual path for staff login
+            } else if (role === 'client') {
+                window.location.href = 'BankSystemAppView_Client/Login/login.html'; // Change this to the actual path for client login
+            } else {
+                alert('Invalid role selected.');
+            }
+        }
+    </script>
+
+</body>
+</html>
