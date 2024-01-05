@@ -1,0 +1,202 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" href="~/style/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/style/lib/bootstrap/dist/css/bootstrap.css" />
+
+</head>
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient m-lg-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Create Current account</h2>
+
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4 d-flex flex-column col-12">
+
+        <form method="post" class="p-4 col-12" id="CurrectAccountForm">
+            <div class="border p-3">
+
+                    <div class="form-floating py-2 col-12">
+                        <label class="p-0 text-secondary" asp-for="ClientId">Client Id</label>
+                             <input asp-for="IdCardNumber" id="IdCardNumber" class="form-control border-0 shadow" />
+                     </select>
+                     <span asp-validation-for="ClientId" class="text-danger"></span>
+                 </div>
+                   <div class="form-floating py-2 col-12">
+                       <label class="p-0 ms-2 text-secondary" asp-for="pinCode">Pin</label>
+                         <input asp-for="pinCode" id="pinCode" class="form-control border-0 shadow" />
+                     <span asp-validation-for="pinCode" class="text-danger"></span>
+                 </div>
+
+                 <div class="form-floating py-2 col-12">
+                       <label class="p-0 ms-2 text-secondary" asp-for="balance">Balance</label>
+                         <input asp-for="balance" id="balance" class="form-control border-0 shadow"  />
+                     <span asp-validation-for="balance" class="text-danger"></span>
+                 </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 ms-2 text-secondary" asp-for="AccountId">Valuta</label>
+                    <select asp-for="Valuta" id ="valuta" class="form-select form-control shadow border-0" onclick="getDropdownValutes()">
+                          <option id ="valutaId" selected > -- Select valute -- </option>
+                      </select>
+                      <span asp-validation-for="Valuta" class="text-danger"></span>
+                  </div>
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3">
+                        <button type="submit" class="btn btn-secondary form-control">Create</button>
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <a href="../CurrentAccount/Index.html" class="btn btn-outline-secondary  form-control">Back</a>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="..." crossorigin="anonymous"></script>
+
+
+
+
+<script>
+
+  document.getElementById("CurrectAccountForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const authToken = localStorage.getItem('authToken');
+
+    const ClientUserValue = document.getElementById("userId").value;
+    const ClientPinCodeValue = document.getElementById("pinCode").value;
+    const ClientBalanceValue = document.getElementById("balance").value;
+    const ClientValuteValue = document.getElementById("valuteId").value;
+
+    console.log(authToken);
+    const AccountUrl = 'https://localhost:7100/Account';
+    const data = {
+      userId: ClientUserValue,
+      pinCode: ClientPinCodeValue,
+      balance: ClientBalanceValue,
+      valuteId: ClientValuteValue
+    };
+
+    // Make the API request using fetch
+    fetch(AccountUrl, {
+        method: 'POST',
+        headers: {
+            'Accept': '*/*',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => handleCreateClientResponse(data))
+    .catch(error => console.error('Error:', error));
+});
+function handleGetClientDetailsResponse(response) {
+    // Handle the response from the get client details API endpoint
+    if (response.success) {
+        // Client details retrieved successfully
+        console.log('Client details:', response.data);
+        console.log('status: ', response.status);
+
+        // Get the select element
+        const selectElement = document.getElementById("userId");
+
+        // Clear existing options
+        selectElement.innerHTML = '';
+
+        // Add a default option
+        const defaultOption = document.createElement("option");
+        defaultOption.text = '-- Select client --';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        selectElement.add(defaultOption);
+
+        // Add options based on the client details
+        response.data.forEach(client => {
+            const option = document.createElement("option");
+            option.value = client.clientId;
+            option.text = client.clientName;
+            selectElement.add(option);
+        });
+    } else {
+        // Client details retrieval failed
+        const errorMessage = response.errors || 'Client details retrieval failed.';
+        console.error('Error:', errorMessage);
+
+        // You can display an error message to the user.
+    }
+}
+
+
+
+
+function getDropdownValutes() {
+    const valutaDropdown = document.getElementById('valuta');
+    const authToken = localStorage.getItem('authToken');
+
+    // Assuming there's an endpoint for fetching valutes, replace this with your actual endpoint
+    const valutesUrl = 'https://localhost:7100/Account/get-valutes-for-dropdown';
+
+
+    // Make the API request using fetch
+    fetch(valutesUrl, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,  // Include the token in the Authorization header
+        },
+    })
+    .then(response => response.json())
+    .then(data => populateValutaDropdown(valutaDropdown, data.data))
+    .catch(error => console.error('Error:', error));
+
+}
+
+
+
+
+function populateValutaDropdown(dropdown, valutes) {
+    // Clear existing options
+    dropdown.innerHTML = '';
+
+    // Add the default option
+    const defaultOption = document.createElement('option');
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    defaultOption.textContent = '-- Select valute --';
+    dropdown.appendChild(defaultOption);
+
+    // Add options for each valute
+    valutes.forEach(valute => {
+        const option = document.createElement('option');
+        option.value = valute.id; // Set the value attribute based on the valute id or other unique identifier
+        option.textContent = valute.name;
+        
+        dropdown.appendChild(option);
+    });
+
+
+
+}
+
+
+
+</script>

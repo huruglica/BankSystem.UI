@@ -1,0 +1,226 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" href="~/style/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/style/lib/bootstrap/dist/css/bootstrap.css" />
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-sm bg-secondary navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Client" asp-action="Index">BankSystemApp</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav me-auto">
+
+                            <li class="nav-item">
+                            <a class="nav-link" href="../Staff/Index.html">Staff</a>
+                            </li>
+                            <li class="nav-item">
+                            <a class="nav-link" href="../Client/Index.html">Client</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../CurrentAccount/Index.html">Current Account</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="../Deposit/Index.html">Deposit amount</a></li>
+                                    <li><a class="dropdown-item" href="../Withdrawal/Index.html">Withdrawal amount</a></li>
+                                </ul>
+                            </li>
+                    </ul>
+                    <ul class="navbar-nav">
+ <li class="nav-item">
+        <a class="nav-link" id="register" asp-area="Identity" href="../Login/Register.html">Register</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="login" asp-area="Identity" href="../Login/Login.html">Login</a>
+    </li>
+
+    </ul>
+                </div>
+            </div>
+        </nav>
+        
+
+    </header>
+<div class="container">
+    <div class="row pt-4 pb-4">
+        <div class="col-6 col-md-6 text-primary">
+            <h2 class="text-secondary">Clients</h2>
+        </div> 
+        <div class="col-6 text-right">
+            <a class="btn btn-secondary" href="../Client/Create.html" onclick="getCurrentAccountsList()"><i class="bi bi-plus-circle"></i> Create</a>
+        </div>
+
+    </div>
+<table class="table table-bordered table-striped text-center">
+    <thead>
+        <tr>
+
+         <th>Id Card</th>
+         <th>Client name</th>
+         <th>Surname</th>
+         <th>Email</th>
+         <th>Phone number</th>
+         <th>Address</th>
+         <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id ="clientTableBody">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+       </tbody>
+</table>
+
+</div>
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="..." crossorigin="anonymous"></script>
+<footer class="footer border-bottom bg-secondary mt-auto">
+    <div class="container">
+       Made with <i class="bi bi-heart-fill"></i> by Genita
+    </div>
+</footer>
+</body>
+
+
+<script>
+
+if (window.location.href.endsWith('/Client/Index.html')) {
+    // Your code to handle the case when the URL ends with '/Staff/Index.html'
+const authToken = localStorage.getItem('authToken');
+
+// Check if the token is present before making the API request
+if (authToken) {
+    // Assuming there's an endpoint for fetching client details, replace this with your actual endpoint
+    const getClientDetailsUrl = 'https://localhost:7190/User/client';
+    console.log(authToken);
+    // Make the API request using fetch
+    fetch(getClientDetailsUrl, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,  // Include the token in the Authorization header
+        },
+    })
+    .then(response => response.json())
+    .then(data => handleGetClientDetailsResponse(data))
+    .catch(error => console.error('Error:', error));
+} else {
+    // Handle the case when the token is not present (user is not logged in)
+    console.error('User not logged in. Cannot make the API request.');
+}
+
+function handleGetClientDetailsResponse(response) {
+    // Handle the response from the get client details API endpoint
+    if (response.success) {
+        // Client details retrieved successfully
+        //console.log('Client details:', response.data);
+        //updateTable (response.data);
+        // You can update the UI with the client details or perform other actions.
+
+        if (response.data && response.data.length > 0) {
+        // Client details retrieved successfully and response.data is not empty
+        console.log('Client details:', response.data);
+        updateTableForClient(response.data);
+        // You can update the UI with the client details or perform other actions.
+    } 
+    }
+     else {
+        // Client details retrieval failed
+        const errorMessage = response.errors || 'Client details retrieval failed.';
+        console.error('Error:', errorMessage);
+
+        // You can display an error message to the user.
+    }
+}
+
+
+}
+
+
+
+
+
+function updateTableForClient(data) {
+    const tableBody = document.getElementById('clientTableBody');
+    tableBody.innerHTML = '';
+
+  
+       data.forEach(client => {
+    // Create a new row for each client
+    const newRow = tableBody.insertRow();
+
+    // Flag to skip the first property (column)
+    let skipFirstColumn = true;
+
+    // Iterate over the properties in the client object and populate the cells
+    for (const property in client) {
+        if (client.hasOwnProperty(property)) {
+            // Skip the first column
+            if (skipFirstColumn) {
+                skipFirstColumn = false;
+                continue;
+            }
+
+            const cell = newRow.insertCell();
+            cell.textContent = `${client[property] || ''}`; // Use empty string if the property is undefined
+        }
+    }
+
+    // Add buttons cell
+    const actionsCell = newRow.insertCell();
+    const buttonsDiv = createButtonsDiv();
+    actionsCell.appendChild(buttonsDiv);
+});
+
+   
+}
+
+
+function createButtonsDiv() {
+    const divElement = document.createElement('div');
+    divElement.className = 'btn-group w-75';
+    divElement.innerHTML = `
+        <a class="btn btn-secondary mx-2" onclick="editRow(this)">Edit <i class="bi bi-pencil-square"></i></a>
+        <a class="btn btn-danger mx-2" onclick="deleteRow(this)">Delete <i class="bi bi-trash"></i></a>
+    `;
+    return divElement;
+}
+
+// Function to handle the edit button click
+function editRow(button) {
+    const row = button.closest('tr');
+    // Implement your edit logic here using the row data
+    console.log('Edit clicked for row:', row);
+}
+
+// Function to handle the delete button click
+function deleteRow(button) {
+    const row = button.closest('tr');
+    // Implement your delete logic here using the row data
+    console.log('Delete clicked for row:', row);
+}
+</script>
