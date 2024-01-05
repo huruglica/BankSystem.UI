@@ -9,6 +9,11 @@
     <link rel="stylesheet" href="~/style/lib/bootstrap/dist/css/bootstrap.css" />
 
 </head>
+<style>
+    .hidden-td {
+      display: none;
+    }
+  </style>
 <body class="d-flex flex-column min-vh-100">
     <header>
         <nav class="navbar navbar-expand-sm bg-secondary navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
@@ -22,7 +27,7 @@
                     <ul class="navbar-nav me-auto">
 
                             <li class="nav-item">
-                                 <a class="nav-link" href="../Staff/Index.html" onclick="getStaffList()">Staff</a>
+                                 <a class="nav-link" href="../Staff/Index.html" >Staff</a>
                              </li>
                             <li class="nav-item">
                                  <a class="nav-link" href="../Client/Index.html">Client</a>
@@ -68,7 +73,7 @@
 <table class="table table-bordered table-striped text-center">
     <thead>
         <tr>
-
+         <th class="hidden-td"> Id </th>
          <th>Id Card</th>
          <th>Client name</th>
          <th>Surname</th>
@@ -77,6 +82,7 @@
         </tr>
     </thead>
     <tbody id ="staffTableBody">
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -100,97 +106,64 @@
 </footer>
 </body>
 
-
-
 <script>
 
 if (window.location.href.endsWith('/Staff/Index.html')) {
-    // Your code to handle the case when the URL ends with '/Staff/Index.html'
-const authToken = localStorage.getItem('authToken');
+    const authToken = localStorage.getItem('authToken');
 
-// Check if the token is present before making the API request
-if (authToken) {
-    // Assuming there's an endpoint for fetching client details, replace this with your actual endpoint
-    const getStaffDetailsUrl = 'https://localhost:7190/User';
-    console.log(authToken);
-    // Make the API request using fetch
-    fetch(getStaffDetailsUrl, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,  // Include the token in the Authorization header
-        },
-    })
-    .then(response => response.json())
-    .then(data => handleGetClientDetailsResponse(data))
-    .catch(error => console.error('Error:', error));
-} else {
-    // Handle the case when the token is not present (user is not logged in)
-    console.error('User not logged in. Cannot make the API request.');
-}
-
-function handleGetClientDetailsResponse(response) {
-    // Handle the response from the get client details API endpoint
-    if (response.success) {
-        // Client details retrieved successfully
-        if (response.data && response.data.length > 0) {
-        // Client details retrieved successfully and response.data is not empty
-        console.log('Client details:', response.data);
-        updateTable(response.data);
-        // You can update the UI with the client details or perform other actions.
-    } 
-        // You can update the UI with the client details or perform other actions.
+    if (authToken) {
+        const getStaffDetailsUrl = 'https://localhost:7190/User';
+        
+        fetch(getStaffDetailsUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+        })
+        .then(response => response.json())
+        .then(data => handleGetClientDetailsResponse(data))
+        .catch(error => console.error('Error:', error));
     } else {
-        // Client details retrieval failed
-        const errorMessage = response.errors || 'Staff details retrieval failed.';
-        console.error('Error:', errorMessage);
+        console.error('User not logged in. Cannot make the API request.');
+    }
 
-        // You can display an error message to the user.
+    function handleGetClientDetailsResponse(response) {
+        if (response.success) {
+            if (response.data && response.data.length > 0) {
+                updateTable(response.data);
+            } 
+        } else {
+            const errorMessage = response.errors || 'Staff details retrieval failed.';
+            console.error('Error:', errorMessage);
+        }
     }
 }
-
-
-}
-
-
-
 
 function updateTable(data) {
     const tableBody = document.getElementById('staffTableBody');
     tableBody.innerHTML = '';
-
   
-       data.forEach(client => {
-    // Create a new row for each client
-    const newRow = tableBody.insertRow();
+    data.forEach(client => {
+        const newRow = tableBody.insertRow();
 
-    // Flag to skip the first property (column)
-    let skipFirstColumn = true;
-
-    // Iterate over the properties in the client object and populate the cells
-    for (const property in client) {
-        if (client.hasOwnProperty(property)) {
-            // Skip the first column
-            if (skipFirstColumn) {
-                skipFirstColumn = false;
-                continue;
+        for (const property in client) {
+            if (client.hasOwnProperty(property)) {
+                if (client.hasOwnProperty(property)) {
+                    const cell = newRow.insertCell();
+                    if (property === 'id') {
+                        cell.className = 'hidden-td';
+                    }
+                    cell.textContent = `${client[property] || ''}`; 
+                }
             }
-
-            const cell = newRow.insertCell();
-            cell.textContent = `${client[property] || ''}`; // Use empty string if the property is undefined
         }
-    }
-
-    // Add buttons cell
-    const actionsCell = newRow.insertCell();
-    const buttonsDiv = createButtonsDiv();
-    actionsCell.appendChild(buttonsDiv);
-});
-
-   
+        const actionsCell = newRow.insertCell();
+        const buttonsDiv = createButtonsDiv();
+        actionsCell.appendChild(buttonsDiv);
+    });
 }
-
 
 function createButtonsDiv() {
     const divElement = document.createElement('div');
@@ -202,17 +175,14 @@ function createButtonsDiv() {
     return divElement;
 }
 
-// Function to handle the edit button click
 function editRow(button) {
     const row = button.closest('tr');
-    // Implement your edit logic here using the row data
-    console.log('Edit clicked for row:', row);
+    const idCell = row.cells[0];
+    const id = idCell.textContent.trim();
+    window.location.href = `../Staff/Edit.html?id=${id}`;
 }
 
-// Function to handle the delete button click
 function deleteRow(button) {
     const row = button.closest('tr');
-    // Implement your delete logic here using the row data
-    console.log('Delete clicked for row:', row);
 }
 </script>

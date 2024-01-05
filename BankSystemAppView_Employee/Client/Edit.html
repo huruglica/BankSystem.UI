@@ -1,0 +1,150 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" href="~/style/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/style/lib/bootstrap/dist/css/bootstrap.css" />
+</head>
+    <style>
+  .hidden-td {
+    display: none;
+  }
+</style>
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient m-lg-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Edit Client</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4 d-flex flex-column col-12">
+        <form method="put" class="p-4 col-12"> 
+            <div class="border p-3">
+                <input type ="hidden" id ="id"/>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="IdCardClient" class="ms-2">Id Card</label>
+                    <input id="IdCardClient" disabled class="form-control border-0 shadow" />
+                    <span asp-validation-for="IdCardClient" class="text-danger"></span>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="Name" class="ms-2">Name</label>
+                    <input id="name" disabled class="form-control border-0 shadow" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="Surname" class="ms-2">Surname</label>
+                    <input id="surname" class="form-control border-0 shadow" />
+                    <span asp-validation-for="Surname" class="text-danger"></span>
+                </div>
+               <div class="form-floating mb-3 col-12 hidden-td">
+                <label class="p-0 text-secondary ms-2"  asp-for="Input.Password">Pin</label>
+                <input id="pin" class="form-control border-0 shadow" autocomplete="new-password" aria-required="true" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+              </div>
+                <div class="form-floating py-2 col-12">
+                    <label class="p-0 text-secondary" asp-for="Email" class="ms-2">Email</label>
+                    <input id="email" disabled class="form-control border-0 shadow" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3">
+                        <button type="button" onclick="editFormClient()" class="btn btn-secondary form-control">Edit</button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href ="../Staff/Index.html" class="btn btn-outline-secondary  form-control">Back</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</html>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="..." crossorigin="anonymous"></script>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const clientId = urlParams.get('id');
+const authToken = localStorage.getItem('authToken');
+
+if (authToken) {
+    const getClientDetailsUrl = `https://localhost:7190/User/${clientId}`;
+
+    fetch(getClientDetailsUrl, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+        },
+    })
+    .then(response => response.json())
+    .then(data => handleGetClientDetailsResponseById(data))
+    .catch(error => console.error('Error:', error));
+} 
+
+function handleGetClientDetailsResponseById(response) {
+    if (response.success) {
+        fillFormWithData(response.data);
+    }
+     else {
+        const errorMessage = response.errors || 'Client details retrieval failed.';
+        console.error('Error:', errorMessage);
+    }
+}
+
+function fillFormWithData(clientData) {
+    document.getElementById('id').value = clientData.id || '';
+    document.getElementById('IdCardClient').value = clientData.idCardNumber || '';
+    document.getElementById('name').value = clientData.name || '';
+    document.getElementById('surname').value = clientData.surname || '';
+    document.getElementById('pin').value = clientData.pin || '';
+    document.getElementById('address').value = clientData.address || '';
+    document.getElementById('phoneNumber').value = clientData.phoneNumber || '';
+    document.getElementById('email').value = clientData.email || '';
+}
+
+function editFormClient() {
+    const pathUrl = new URLSearchParams(window.location.search);
+    const pathUrlId = pathUrl.get('id');
+    const updateClientUrl = `https://localhost:7190/User/client/${pathUrlId}`;
+
+    const authToken = localStorage.getItem('authToken');
+    
+    const data = {
+        surname: document.getElementById('surname').value,
+        phoneNumber: document.getElementById('phoneNumber').value,
+        email: document.getElementById('email').value
+    };
+
+    fetch(updateClientUrl, {
+        method: 'PUT',
+        headers: {
+            'Accept': '*/*',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => handleUpdateClientResponse(data))
+    .catch(error => console.error('Error:', error));
+}
+
+function handleUpdateClientResponse(response) {
+    if (response.success) {
+        console.log('Client updated successfully.');
+        window.location.href="../Client/Index.html";
+    } else {
+        const errorMessage = response.errors || 'Client update failed.';
+        console.error('Error:', errorMessage);
+    }
+}
+</script>
